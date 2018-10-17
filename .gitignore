@@ -59,3 +59,5 @@ typings/
 
 # next.js build output
 .next
+src/app/_core/core.ts
+src/app/_core/index.ts

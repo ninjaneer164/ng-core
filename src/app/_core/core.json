@@ -1,0 +1,309 @@
+{
+    "classes": [
+        {
+            "name": "IdManager",
+            "constructorCode": "throw new Error('IdManager class cannot be instantiated.');",
+            "properties": [
+                {
+                    "name": "_id",
+                    "type": "number",
+                    "static": true,
+                    "value": "new Date().getTime()"
+                }
+            ],
+            "methods": [
+                {
+                    "name": "getNew",
+                    "type": "number",
+                    "static": true,
+                    "body": "const t = new Date().getTime(); if (t <= IdManager._id) { IdManager._id++; } else { IdManager._id = t; } return IdManager._id;"
+                }
+            ]
+        },
+        {
+            "name": "Utils",
+            "methods": [
+                {
+                    "name": "isNullOrUndefined",
+                    "type": "boolean",
+                    "static": true,
+                    "args": [
+                        {
+                            "name": "obj",
+                            "type": "any"
+                        }
+                    ],
+                    "body": "return ((obj === null) || (obj === undefined));"
+                },
+                {
+                    "name": "isNullOrEmpty",
+                    "type": "boolean",
+                    "static": true,
+                    "args": [
+                        {
+                            "name": "s",
+                            "type": "string"
+                        }
+                    ],
+                    "body": "return (this.isNullOrUndefined(s) || (s.trim().length < 1));"
+                },
+                {
+                    "name": "parseObject",
+                    "type": "any",
+                    "static": true,
+                    "args": [
+                        {
+                            "name": "src",
+                            "type": "any"
+                        },
+                        {
+                            "name": "dst",
+                            "type": "any"
+                        }
+                    ],
+                    "body": "if (!this.isNullOrUndefined(src)) { Object.keys(src).forEach((k) => { if (dst[k] !== undefined) { dst[k] = src[k]; } }); } return dst;"
+                }
+            ]
+        },
+        {
+            "name": "BaseClass",
+            "constructorCode": "this._id = IdManager.getNew();",
+            "properties": [
+                {
+                    "name": "_className",
+                    "type": "string",
+                    "modifier": "protected",
+                    "read": false,
+                    "write": false,
+                    "value": "'BaseClass'"
+                },
+                {
+                    "name": "className",
+                    "type": "string",
+                    "write": "false",
+                    "declare": "false"
+                },
+                {
+                    "name": "id",
+                    "type": "number",
+                    "value": 0,
+                    "getterBody": "return this._id;",
+                    "setterBody": "throw new Error('\"id\" cannot be set');"
+                }
+            ],
+            "methods": [
+                {
+                    "name": "isNullOrUndefined",
+                    "type": "boolean",
+                    "args": [
+                        {
+                            "name": "obj",
+                            "type": "any"
+                        }
+                    ],
+                    "body": "return Utils.isNullOrUndefined(obj);"
+                },
+                {
+                    "name": "isNullOrEmpty",
+                    "type": "boolean",
+                    "args": [
+                        {
+                            "name": "s",
+                            "type": "string"
+                        }
+                    ],
+                    "body": "return Utils.isNullOrEmpty(s);"
+                }
+            ]
+        },
+        {
+            "name": "BaseDirective",
+            "extends": "BaseClass"
+        },
+        {
+            "name": "BaseModel",
+            "extends": "BaseClass",
+            "args": [
+                {
+                    "name": "data",
+                    "optional": true
+                }
+            ],
+            "constructorCode": "Promise.resolve(null).then(() => { this.parseObject(data); });",
+            "methods": [
+                {
+                    "name": "parseObject",
+                    "args": [
+                        {
+                            "name": "data"
+                        }
+                    ],
+                    "body": "Utils.parseObject(data, this);"
+                }
+            ]
+        },
+        {
+            "name": "BasePipe",
+            "extends": "BaseClass"
+        },
+        {
+            "name": "BaseService",
+            "extends": "BaseClass"
+        },
+        {
+            "name": "EventService",
+            "extends": "BaseService",
+            "import": [
+                {
+                    "name": "Injectable",
+                    "path": "@angular/core"
+                },
+                {
+                    "name": "Subscription",
+                    "path": "rxjs"
+                },
+                {
+                    "name": "Subject",
+                    "path": "rxjs"
+                }
+            ],
+            "decorator": {
+                "type": "Injectable",
+                "options": [
+                    {
+                        "name": "providedIn",
+                        "value": "'root'"
+                    }
+                ]
+            },
+            "properties": [
+                {
+                    "name": "_events",
+                    "type": "Map<string, Subject<any>>",
+                    "modifier": "private",
+                    "read": false,
+                    "write": false,
+                    "value": "new Map<string, Subject<any>>()"
+                }
+            ],
+            "methods": [
+                {
+                    "name": "dispatch",
+                    "args": [
+                        {
+                            "name": "type",
+                            "type": "string"
+                        },
+                        {
+                            "name": "data",
+                            "type": "any",
+                            "optional": "true"
+                        }
+                    ],
+                    "body": "if (this._events.has(type)) { this._events.get(type).next(data); }"
+                },
+                {
+                    "name": "register",
+                    "type": "Subscription",
+                    "args": [
+                        {
+                            "name": "type",
+                            "type": "string"
+                        },
+                        {
+                            "name": "callback",
+                            "type": "(data?: any) => void"
+                        }
+                    ],
+                    "body": "if (!this._events.has(type)) { this._events.set(type, new Subject<any>()); } return this._events.get(type).subscribe(callback);"
+                },
+                {
+                    "name": "unregister",
+                    "args": [
+                        {
+                            "name": "subscription",
+                            "type": "Subscription"
+                        }
+                    ],
+                    "body": "if (!this.isNullOrUndefined(subscription)) { subscription.unsubscribe(); }"
+                }
+            ]
+        },
+        {
+            "name": "BaseComponent",
+            "extends": "BaseClass",
+            "implements": [
+                "OnDestroy",
+                "OnInit"
+            ],
+            "import": [
+                {
+                    "name": "OnDestroy",
+                    "path": "@angular/core"
+                },
+                {
+                    "name": "OnInit",
+                    "path": "@angular/core"
+                }
+            ],
+            "properties": [
+                {
+                    "name": "eventService",
+                    "type": "EventService",
+                    "modifier": "protected"
+                },
+                {
+                    "name": "_events",
+                    "type": "Subscription[]",
+                    "modifier": "private",
+                    "read": false,
+                    "write": false,
+                    "value": "[]"
+                }
+            ],
+            "methods": [
+                {
+                    "name": "ngOnDestroy",
+                    "body": "this.unregisterEvents();"
+                },
+                {
+                    "name": "ngOnInit"
+                },
+                {
+                    "name": "dispatchEvent",
+                    "args": [
+                        {
+                            "name": "type",
+                            "type": "string"
+                        },
+                        {
+                            "name": "data",
+                            "type": "any",
+                            "optional": true
+                        }
+                    ],
+                    "body": "if (!this.isNullOrUndefined(this.eventService)) { this.eventService.dispatch(type, data); }"
+                },
+                {
+                    "name": "registerEvent",
+                    "args": [
+                        {
+                            "name": "type",
+                            "type": "string"
+                        },
+                        {
+                            "name": "callback",
+                            "type": "any",
+                            "optional": true
+                        }
+                    ],
+                    "body": "if (!this.isNullOrUndefined(this.eventService)) { this._events.push(this.eventService.register(type, callback)); }"
+                },
+                {
+                    "name": "unregisterEvents",
+                    "body": "this._events.forEach((s) => { if (!this.isNullOrUndefined(this.eventService)) { this.eventService.unregister(s); } }); this._events = [];"
+                }
+            ]
+        }
+    ]
+}
