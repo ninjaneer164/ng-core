@@ -5,11 +5,14 @@ import {
     BaseComponent,
     EventService
 } from './_core';
+import {
+    User
+} from './models';
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
-    styleUrls: ['./app.component.css']
+    styleUrls: ['./app.component.scss']
 })
 export class AppComponent extends BaseComponent {
 
@@ -19,6 +22,15 @@ export class AppComponent extends BaseComponent {
         protected eventService: EventService
     ) {
         super();
+
+        const u = new User({
+            firstName: 'foo',
+            lastName: 'bar',
+            username: 'foo@bar.com'
+        });
+        console.log(u);
+        const u_ = u.toObject();
+        console.log(JSON.stringify(u_));
 
         this.registerEvent('foo', (d) => {
             console.log(d);

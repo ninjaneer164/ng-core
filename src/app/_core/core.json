@@ -1,4 +1,9 @@
 {
+    "options": {
+        "className": "_className",
+        "exports": "_exports",
+        "prettify": true
+    },
     "classes": [
         {
             "name": "IdManager",
@@ -8,6 +13,8 @@
                     "name": "_id",
                     "type": "number",
                     "static": true,
+                    "canExport": false,
+                    "useGetterSetter": true,
                     "value": "new Date().getTime()"
                 }
             ],
@@ -73,19 +80,21 @@
                     "name": "_className",
                     "type": "string",
                     "modifier": "protected",
-                    "read": false,
-                    "write": false,
+                    "canExport": false,
                     "value": "'BaseClass'"
                 },
                 {
                     "name": "className",
                     "type": "string",
-                    "write": "false",
-                    "declare": "false"
+                    "canExport": false,
+                    "useGetterSetter": true,
+                    "write": false,
+                    "declare": false
                 },
                 {
                     "name": "id",
                     "type": "number",
+                    "canExport": false,
                     "value": 0,
                     "getterBody": "return this._id;",
                     "setterBody": "throw new Error('\"id\" cannot be set');"
@@ -129,7 +138,45 @@
                     "optional": true
                 }
             ],
-            "constructorCode": "Promise.resolve(null).then(() => { this.parseObject(data); });",
+            "properties": [
+                {
+                    "name": "_isDirty",
+                    "type": "boolean",
+                    "modifier": "protected",
+                    "canExport": false,
+                    "value": false
+                },
+                {
+                    "name": "isDirty",
+                    "type": "boolean",
+                    "canExport": false,
+                    "useGetterSetter": true,
+                    "declare": false,
+                    "write": false
+                },
+                {
+                    "name": "_lastUpdated",
+                    "type": "number",
+                    "modifier": "protected",
+                    "canExport": false,
+                    "value": "(new Date()).getTime()"
+                },
+                {
+                    "name": "lastUpdated",
+                    "type": "number",
+                    "canExport": false,
+                    "useGetterSetter": true,
+                    "declare": false,
+                    "write": false
+                },
+                {
+                    "name": "_exports",
+                    "type": "string[]",
+                    "modifier": "protected",
+                    "canExport": false,
+                    "value": "[]"
+                }
+            ],
             "methods": [
                 {
                     "name": "parseObject",
@@ -139,6 +186,11 @@
                         }
                     ],
                     "body": "Utils.parseObject(data, this);"
+                },
+                {
+                    "name": "toObject",
+                    "type": "any",
+                    "body": "const o = {}; this._exports.forEach((e) => { if (this[e] !== undefined) { if (this[e]['toObject'] !== undefined) { o[e] = this[e].toObject(); } else { o[e] = this[e]; } } }); return o;"
                 }
             ]
         },
@@ -181,8 +233,7 @@
                     "name": "_events",
                     "type": "Map<string, Subject<any>>",
                     "modifier": "private",
-                    "read": false,
-                    "write": false,
+                    "canExport": false,
                     "value": "new Map<string, Subject<any>>()"
                 }
             ],
@@ -197,7 +248,7 @@
                         {
                             "name": "data",
                             "type": "any",
-                            "optional": "true"
+                            "optional": true
                         }
                     ],
                     "body": "if (this._events.has(type)) { this._events.get(type).next(data); }"
@@ -250,14 +301,16 @@
                 {
                     "name": "eventService",
                     "type": "EventService",
-                    "modifier": "protected"
+                    "modifier": "protected",
+                    "canExport": false,
+                    "useGetterSetter": true,
+                    "value": "null"
                 },
                 {
                     "name": "_events",
                     "type": "Subscription[]",
                     "modifier": "private",
-                    "read": false,
-                    "write": false,
+                    "canExport": false,
                     "value": "[]"
                 }
             ],
@@ -278,7 +331,6 @@
                         },
                         {
                             "name": "data",
-                            "type": "any",
                             "optional": true
                         }
                     ],
@@ -293,7 +345,6 @@
                         },
                         {
                             "name": "callback",
-                            "type": "any",
                             "optional": true
                         }
                     ],
@@ -302,6 +353,36 @@
                 {
                     "name": "unregisterEvents",
                     "body": "this._events.forEach((s) => { if (!this.isNullOrUndefined(this.eventService)) { this.eventService.unregister(s); } }); this._events = [];"
+                }
+            ]
+        },
+        {
+            "name": "User",
+            "extends": "BaseModel",
+            "args": [
+                {
+                    "name": "name"
+                },
+                {
+                    "name": "data",
+                    "optional": true
+                }
+            ],
+            "superArgs": [
+                {
+                    "name": "data"
+                }
+            ],
+            "properties": [
+                {
+                    "name": "firstName",
+                    "type": "string",
+                    "value": "''"
+                },
+                {
+                    "name": "lastName",
+                    "type": "string",
+                    "value": "''"
                 }
             ]
         }
