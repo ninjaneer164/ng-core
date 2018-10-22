@@ -31,6 +31,10 @@ export class AppComponent extends BaseComponent {
         console.log(u);
         const u_ = u.toObject();
         console.log(JSON.stringify(u_));
+        const u0 = u.clone();
+        console.log(u0);
+        const u0_ = u0.toObject();
+        console.log(JSON.stringify(u0_));
 
         this.registerEvent('foo', (d) => {
             console.log(d);

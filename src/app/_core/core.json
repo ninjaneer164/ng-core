@@ -1,9 +1,29 @@
 {
     "options": {
         "className": "_className",
-        "exports": "_exports",
         "prettify": true
     },
+    "interfaces": [
+        {
+            "name": "Cloneable",
+            "methods": [
+                {
+                    "name": "clone",
+                    "type": "Cloneable",
+                    "args": [
+                        {
+                            "name": "obj",
+                            "type": "Cloneable"
+                        }
+                    ]
+                },
+                {
+                    "name": "toObject",
+                    "type": "any"
+                }
+            ]
+        }
+    ],
     "classes": [
         {
             "name": "IdManager",
@@ -13,6 +33,7 @@
                     "name": "_id",
                     "type": "number",
                     "static": true,
+                    "canClone": false,
                     "canExport": false,
                     "useGetterSetter": true,
                     "value": "new Date().getTime()"
@@ -80,12 +101,14 @@
                     "name": "_className",
                     "type": "string",
                     "modifier": "protected",
+                    "canClone": false,
                     "canExport": false,
                     "value": "'BaseClass'"
                 },
                 {
                     "name": "className",
                     "type": "string",
+                    "canClone": false,
                     "canExport": false,
                     "useGetterSetter": true,
                     "write": false,
@@ -94,6 +117,7 @@
                 {
                     "name": "id",
                     "type": "number",
+                    "canClone": false,
                     "canExport": false,
                     "value": 0,
                     "getterBody": "return this._id;",
@@ -132,6 +156,10 @@
         {
             "name": "BaseModel",
             "extends": "BaseClass",
+            "implements": [
+                "Cloneable"
+            ],
+            "isBaseModel": true,
             "args": [
                 {
                     "name": "data",
@@ -143,12 +171,14 @@
                     "name": "_isDirty",
                     "type": "boolean",
                     "modifier": "protected",
+                    "canClone": false,
                     "canExport": false,
                     "value": false
                 },
                 {
                     "name": "isDirty",
                     "type": "boolean",
+                    "canClone": false,
                     "canExport": false,
                     "useGetterSetter": true,
                     "declare": false,
@@ -158,26 +188,42 @@
                     "name": "_lastUpdated",
                     "type": "number",
                     "modifier": "protected",
+                    "canClone": false,
                     "canExport": false,
                     "value": "(new Date()).getTime()"
                 },
                 {
                     "name": "lastUpdated",
                     "type": "number",
+                    "canClone": false,
                     "canExport": false,
                     "useGetterSetter": true,
                     "declare": false,
                     "write": false
                 },
                 {
-                    "name": "_exports",
-                    "type": "string[]",
+                    "name": "__",
                     "modifier": "protected",
+                    "canClone": false,
                     "canExport": false,
-                    "value": "[]"
+                    "value": "{}"
                 }
             ],
             "methods": [
+                {
+                    "name": "clone",
+                    "type": "Cloneable",
+                    "args": [
+                        {
+                            "name": "obj",
+                            "type": "Cloneable"
+                        }
+                    ],
+                    "body": "const o = obj || {}; if (this._clones !== undefined) { this._clones.forEach((k) => { o[k] = this[k]; }); } return <Cloneable>o;"
+                },
+                {
+                    "name": "commit"
+                },
                 {
                     "name": "parseObject",
                     "args": [
@@ -185,7 +231,10 @@
                             "name": "data"
                         }
                     ],
-                    "body": "Utils.parseObject(data, this);"
+                    "body": "if (!this.isNullOrUndefined(data)) { Utils.parseObject(data, this); this.__ = {}; Object.keys(data).forEach((k) => { if (!this.isNullOrUndefined(this[k])) { this.__[k] = this[k]; } }); }"
+                },
+                {
+                    "name": "revert"
                 },
                 {
                     "name": "toObject",
@@ -233,6 +282,7 @@
                     "name": "_events",
                     "type": "Map<string, Subject<any>>",
                     "modifier": "private",
+                    "canClone": false,
                     "canExport": false,
                     "value": "new Map<string, Subject<any>>()"
                 }
@@ -302,6 +352,7 @@
                     "name": "eventService",
                     "type": "EventService",
                     "modifier": "protected",
+                    "canClone": false,
                     "canExport": false,
                     "useGetterSetter": true,
                     "value": "null"
@@ -310,6 +361,7 @@
                     "name": "_events",
                     "type": "Subscription[]",
                     "modifier": "private",
+                    "canClone": false,
                     "canExport": false,
                     "value": "[]"
                 }
@@ -359,10 +411,11 @@
         {
             "name": "User",
             "extends": "BaseModel",
+            "implements": [
+                "Cloneable"
+            ],
+            "canClone": true,
             "args": [
-                {
-                    "name": "name"
-                },
                 {
                     "name": "data",
                     "optional": true

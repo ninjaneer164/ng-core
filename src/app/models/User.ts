@@ -1,5 +1,5 @@
 import {
-    User as UserBase
+    User as UserBase, Cloneable
 } from '../_core';
 
 export class User extends UserBase {
@@ -8,10 +8,11 @@ export class User extends UserBase {
 
     constructor(data?: any) {
         super(data);
-        this._exports = [
-            ...this._exports,
-            'username'
-        ];
+        this.registerProperty('username');
         this.parseObject(data);
+    }
+
+    public clone(): Cloneable {
+        return super.clone(<Cloneable>new User());
     }
 }
