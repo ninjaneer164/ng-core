@@ -3,27 +3,6 @@
         "className": "_className",
         "prettify": true
     },
-    "interfaces": [
-        {
-            "name": "Cloneable",
-            "methods": [
-                {
-                    "name": "clone",
-                    "type": "Cloneable",
-                    "args": [
-                        {
-                            "name": "obj",
-                            "type": "Cloneable"
-                        }
-                    ]
-                },
-                {
-                    "name": "toObject",
-                    "type": "any"
-                }
-            ]
-        }
-    ],
     "classes": [
         {
             "name": "IdManager",
@@ -156,9 +135,9 @@
         {
             "name": "BaseModel",
             "extends": "BaseClass",
-            "implements": [
-                "Cloneable"
-            ],
+            "canClone": true,
+            "canExport": true,
+            "canUndo": true,
             "isBaseModel": true,
             "args": [
                 {
@@ -207,39 +186,6 @@
                     "canClone": false,
                     "canExport": false,
                     "value": "{}"
-                }
-            ],
-            "methods": [
-                {
-                    "name": "clone",
-                    "type": "Cloneable",
-                    "args": [
-                        {
-                            "name": "obj",
-                            "type": "Cloneable"
-                        }
-                    ],
-                    "body": "const o = obj || {}; if (this._clones !== undefined) { this._clones.forEach((k) => { o[k] = this[k]; }); } return <Cloneable>o;"
-                },
-                {
-                    "name": "commit"
-                },
-                {
-                    "name": "parseObject",
-                    "args": [
-                        {
-                            "name": "data"
-                        }
-                    ],
-                    "body": "if (!this.isNullOrUndefined(data)) { Utils.parseObject(data, this); this.__ = {}; Object.keys(data).forEach((k) => { if (!this.isNullOrUndefined(this[k])) { this.__[k] = this[k]; } }); }"
-                },
-                {
-                    "name": "revert"
-                },
-                {
-                    "name": "toObject",
-                    "type": "any",
-                    "body": "const o = {}; this._exports.forEach((e) => { if (this[e] !== undefined) { if (this[e]['toObject'] !== undefined) { o[e] = this[e].toObject(); } else { o[e] = this[e]; } } }); return o;"
                 }
             ]
         },
@@ -411,9 +357,6 @@
         {
             "name": "User",
             "extends": "BaseModel",
-            "implements": [
-                "Cloneable"
-            ],
             "canClone": true,
             "args": [
                 {

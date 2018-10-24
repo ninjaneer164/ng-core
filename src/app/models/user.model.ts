@@ -1,5 +1,5 @@
 import {
-    User as UserBase, Cloneable
+    User as UserBase
 } from '../_core';
 
 export class User extends UserBase {
@@ -12,7 +12,7 @@ export class User extends UserBase {
         this.parseObject(data);
     }
 
-    public clone(): Cloneable {
-        return super.clone(<Cloneable>new User());
+    public clone(): User {
+        return super.clone(new User());
     }
 }
