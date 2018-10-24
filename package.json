@@ -32,7 +32,7 @@
         "@types/jasmine": "~2.8.8",
         "@types/jasminewd2": "~2.0.3",
         "@types/node": "~8.9.4",
-        "code-gen-ts": "^0.1.7",
+        "code-gen-ts": "^0.1.9",
         "codelyzer": "~4.5.0",
         "concurrently": "^4.0.1",
         "gulp": "^4.0.0",
